@@ -1,0 +1,126 @@
+[
+  {
+    "description": "empty condition matches any document or scalar",
+    "condition": {},
+    "records": [
+      { "data": {}, "expected": true },
+      { "data": { "name": "Bruno Mars" }, "expected": true },
+      { "data": [], "expected": true },
+      { "data": "string", "expected": true },
+      { "data": 2147483647, "expected": true },
+      { "data": null, "expected": true }
+    ]
+  },
+  {
+    "description": "single-layer field matching",
+    "condition": {
+      "name": "John",
+      "age": 30
+    },
+    "records": [
+      { "data": { "name": "John", "age": 30 }, "expected": true },
+      { "data": { "name": "John", "age": 30, "extra": "value" }, "expected": true },
+      { "data": { "name": "john", "age": 30 }, "expected": false },
+      { "data": { "name": "Frank", "age": 30 }, "expected": false },
+      { "data": { "name": "John", "age": 20 }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "two-layer nested object matching",
+    "condition": {
+      "name": "John",
+      "age": 30,
+      "address": {
+        "city": "Taipei"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "address": { "city": "Taipei", "zip": "100" }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "address": { "city": "New York" }
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "address": null
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "deeply nested object matching (8 levels)",
+    "condition": {
+      "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "No!" } } } } } } }
+    },
+    "records": [
+      {
+        "data": {
+          "name": "Anna",
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "No!" } } } } } } }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "Anna",
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "Yes!" } } } } } } }
+        },
+        "expected": false
+      },
+      {
+        "data": { "name": "Anna" },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "deeply nested null condition matches both explicit null and missing leaf key",
+    "condition": {
+      "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": null } } } } } } }
+    },
+    "records": [
+      {
+        "data": {
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": null } } } } } } }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": {} } } } } } }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "No!" } } } } } } }
+        },
+        "expected": false
+      },
+      {
+        "data": {},
+        "expected": false
+      },
+      {
+        "data": null,
+        "expected": false
+      }
+    ]
+  }
+]

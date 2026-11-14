@@ -1,0 +1,51 @@
+[
+  {
+    "description": "operator $regex with anchors, character classes, and optional group",
+    "condition": {
+      "email": {
+        "$regex": "^[^@]+@mongory(app)?\\.com$"
+      }
+    },
+    "records": [
+      { "data": { "email": "bruno_mars@mongory.com" }, "expected": true },
+      { "data": { "email": "bruno.mars@mongoryapp.com" }, "expected": true },
+      { "data": { "email": "vocano@mongory.com" }, "expected": true },
+      { "data": { "email": "vocano@@mongory.com" }, "expected": false },
+      { "data": { "email": "anyone@mongoryppap.com" }, "expected": false },
+      { "data": { "email": "anyone@mongory.com.tw" }, "expected": false },
+      { "data": { "email": "anyone#mongory.com" }, "expected": false },
+      { "data": { "email": null }, "expected": false },
+      { "data": { "email": 12345 }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $regex unanchored substring and alternation",
+    "condition": {
+      "role": {
+        "$regex": "admin|moderator"
+      }
+    },
+    "records": [
+      { "data": { "role": "super_admin" }, "expected": true },
+      { "data": { "role": "moderator_level_1" }, "expected": true },
+      { "data": { "role": "guest" }, "expected": false },
+      { "data": { "role": null }, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $regex with digit quantifiers",
+    "condition": {
+      "code": {
+        "$regex": "^[A-Z]{2}-\\d{3,4}$"
+      }
+    },
+    "records": [
+      { "data": { "code": "TW-100" }, "expected": true },
+      { "data": { "code": "US-9801" }, "expected": true },
+      { "data": { "code": "TW-12" }, "expected": false },
+      { "data": { "code": "TW-12345" }, "expected": false },
+      { "data": { "code": "tw-100" }, "expected": false }
+    ]
+  }
+]

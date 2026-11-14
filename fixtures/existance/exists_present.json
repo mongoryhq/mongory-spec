@@ -1,0 +1,84 @@
+[
+  {
+    "description": "operator $exists true distinguishes present/null key from missing key",
+    "condition": {
+      "age": { "$exists": true }
+    },
+    "records": [
+      { "data": { "age": 30 }, "expected": true },
+      { "data": { "age": null }, "expected": true },
+      { "data": { "age": false }, "expected": true },
+      { "data": { "age": "" }, "expected": true },
+      { "data": { "name": "John" }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $exists false matches only when key is absent",
+    "condition": {
+      "age": { "$exists": false }
+    },
+    "records": [
+      { "data": { "name": "John" }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "age": 30 }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $present true matches non-null non-empty values",
+    "condition": {
+      "name": { "$present": true }
+    },
+    "records": [
+      { "data": { "name": "John" }, "expected": true },
+      { "data": { "name": 0 }, "expected": true },
+      { "data": { "name": ["a"] }, "expected": true },
+      { "data": { "name": { "k": "v" } }, "expected": true },
+      { "data": { "name": "" }, "expected": false },
+      { "data": { "name": [] }, "expected": false },
+      { "data": { "name": {} }, "expected": false },
+      { "data": { "name": false }, "expected": false },
+      { "data": { "name": null }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $present false matches null, missing key, false, or empty string/array/object",
+    "condition": {
+      "name": { "$present": false }
+    },
+    "records": [
+      { "data": { "name": "" }, "expected": true },
+      { "data": { "name": [] }, "expected": true },
+      { "data": { "name": {} }, "expected": true },
+      { "data": { "name": false }, "expected": true },
+      { "data": { "name": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "name": "John" }, "expected": false },
+      { "data": { "name": ["a"] }, "expected": false },
+      { "data": { "name": { "k": "v" } }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "nested $present false requires parent object to exist",
+    "condition": {
+      "profile": {
+        "address": {
+          "$present": false
+        }
+      }
+    },
+    "records": [
+      { "data": { "profile": { "address": {} } }, "expected": true },
+      { "data": { "profile": {} }, "expected": true },
+      { "data": { "profile": { "address": { "key": "val" } } }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  }
+]

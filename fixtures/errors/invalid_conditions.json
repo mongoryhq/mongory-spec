@@ -1,0 +1,65 @@
+[
+  {
+    "description": "$in with non-array condition raises error",
+    "condition": {
+      "name": { "$in": "not_an_array" }
+    },
+    "error": true
+  },
+  {
+    "description": "$nin with non-array condition raises error",
+    "condition": {
+      "name": { "$nin": 123 }
+    },
+    "error": true
+  },
+  {
+    "description": "$and with non-array condition raises error",
+    "condition": {
+      "$and": "not_an_array"
+    },
+    "error": true
+  },
+  {
+    "description": "$or with non-array condition raises error",
+    "condition": {
+      "$or": { "name": "John" }
+    },
+    "error": true
+  },
+  {
+    "description": "$present with non-boolean condition raises error",
+    "condition": {
+      "name": { "$present": "yes" }
+    },
+    "error": true
+  },
+  {
+    "description": "$exists with non-boolean condition raises error",
+    "condition": {
+      "name": { "$exists": 1 }
+    },
+    "error": true
+  },
+  {
+    "description": "$elemMatch with non-object condition raises error",
+    "condition": {
+      "items": { "$elemMatch": ["not", "an", "object"] }
+    },
+    "error": true
+  },
+  {
+    "description": "$every with non-object condition raises error",
+    "condition": {
+      "items": { "$every": "not_an_object" }
+    },
+    "error": true
+  },
+  {
+    "description": "$regex with non-string non-regexp condition raises error",
+    "condition": {
+      "email": { "$regex": 12345 }
+    },
+    "error": true
+  }
+]

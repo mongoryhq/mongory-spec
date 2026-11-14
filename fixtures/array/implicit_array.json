@@ -1,0 +1,152 @@
+[
+  {
+    "description": "array field with scalar condition checks element inclusion",
+    "condition": {
+      "tags": "ruby"
+    },
+    "records": [
+      { "data": { "tags": ["ruby"] }, "expected": true },
+      { "data": { "tags": [1, 2, "ruby"] }, "expected": true },
+      { "data": { "tags": ["go", "ruby"] }, "expected": true },
+      { "data": { "tags": ["lala", "port"] }, "expected": false },
+      { "data": { "tags": [] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with array condition checks exact array equality or nested array inclusion",
+    "condition": {
+      "tags": ["tag1", "tag2"]
+    },
+    "records": [
+      { "data": { "tags": ["tag1", "tag2"] }, "expected": true },
+      { "data": { "tags": [["tag1", "tag2"], "tag3"] }, "expected": true },
+      { "data": { "tags": ["tag1"] }, "expected": false },
+      { "data": { "tags": ["tag2", "tag1"] }, "expected": false },
+      { "data": { "tags": "tag1" }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with sub-document condition implicitly applies $elemMatch",
+    "condition": {
+      "people": {
+        "name": "Billy",
+        "age": 18
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "people": [
+            { "name": "Billy", "age": 20 },
+            { "name": "Mary", "age": 18 },
+            { "name": "Billy", "age": 18 }
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "people": [
+            { "name": "Billy", "age": 20 },
+            { "name": "Mary", "age": 18 },
+            { "name": "Frank", "age": 20 }
+          ]
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "array field with comparison operators ($gt, $lt) implicitly applies $elemMatch",
+    "condition": {
+      "scores": {
+        "$gt": 5,
+        "$lt": 8
+      }
+    },
+    "records": [
+      { "data": { "scores": [3, 6, 9] }, "expected": true },
+      { "data": { "scores": [1, 2, 3] }, "expected": false },
+      { "data": { "scores": [3, 9] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with comparison operators ($gte, $lte) implicitly applies $elemMatch",
+    "condition": {
+      "scores": {
+        "$gte": 6,
+        "$lte": 6
+      }
+    },
+    "records": [
+      { "data": { "scores": [3, 6, 9] }, "expected": true },
+      { "data": { "scores": [3, 7, 9] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with $regex implicitly applies $elemMatch",
+    "condition": {
+      "tags": {
+        "$regex": "^ru"
+      }
+    },
+    "records": [
+      { "data": { "tags": ["go", "ruby", "c"] }, "expected": true },
+      { "data": { "tags": ["go", "python", "c"] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with scalar $eq and $ne",
+    "condition": {
+      "tags": {
+        "$eq": "ruby",
+        "$ne": "archived"
+      }
+    },
+    "records": [
+      { "data": { "tags": ["go", "ruby"] }, "expected": true },
+      { "data": { "tags": ["go", "ruby", "archived"] }, "expected": false },
+      { "data": { "tags": ["go", "c"] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with array $eq",
+    "condition": {
+      "tags": {
+        "$eq": ["go", "ruby"]
+      }
+    },
+    "records": [
+      { "data": { "tags": ["go", "ruby"] }, "expected": true },
+      { "data": { "tags": [["go", "ruby"], "c"] }, "expected": true },
+      { "data": { "tags": ["ruby", "go"] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with array $ne",
+    "condition": {
+      "tags": {
+        "$ne": ["go", "ruby"]
+      }
+    },
+    "records": [
+      { "data": { "tags": ["go", "ruby"] }, "expected": false },
+      { "data": { "tags": [["go", "ruby"], "c"] }, "expected": false },
+      { "data": { "tags": ["ruby", "go"] }, "expected": true }
+    ]
+  },
+  {
+    "description": "array of objects exact equality (key order independent within each object)",
+    "condition": {
+      "items": [
+        { "a": 1, "b": "x" }
+      ]
+    },
+    "records": [
+      { "data": { "items": [{ "a": 1, "b": "x" }] }, "expected": true },
+      { "data": { "items": [{ "b": "x", "a": 1 }] }, "expected": true },
+      { "data": { "items": [{ "a": 1, "b": "y" }] }, "expected": false },
+      { "data": { "items": [{ "a": 1, "b": "x", "c": 2 }] }, "expected": false }
+    ]
+  }
+]

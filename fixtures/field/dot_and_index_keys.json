@@ -1,0 +1,118 @@
+[
+  {
+    "description": "dot notation traverses nested objects",
+    "condition": {
+      "do.you.want.to.build.a.snow.man": "No!"
+    },
+    "records": [
+      {
+        "data": {
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "No!" } } } } } } }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "Yes!" } } } } } } }
+        },
+        "expected": false
+      },
+      {
+        "data": {},
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "escaped dot (\\.) matches literal dot key without splitting",
+    "condition": {
+      "a\\.b.c": 10
+    },
+    "records": [
+      {
+        "data": {
+          "a.b": { "c": 10 }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "a": { "b": { "c": 10 } }
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "top-level string numeric key indexes into array or matches object key",
+    "condition": {
+      "0": "ruby"
+    },
+    "records": [
+      { "data": ["ruby", "c"], "expected": true },
+      { "data": ["c", "ruby"], "expected": false },
+      { "data": { "0": "ruby" }, "expected": true },
+      { "data": [{ "0": "ruby" }], "expected": false }
+    ]
+  },
+  {
+    "description": "nested dotted string numeric key indexes into array or matches object key",
+    "condition": {
+      "tags.0": "ruby"
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "c"] }, "expected": true },
+      { "data": { "tags": ["c", "ruby"] }, "expected": false },
+      { "data": { "tags": { "0": "ruby" } }, "expected": true },
+      { "data": { "tags": [{ "0": "ruby" }] }, "expected": false }
+    ]
+  },
+  {
+    "description": "array field with integer and negative index keys",
+    "condition": {
+      "tags": {
+        "0": "ruby",
+        "-1": "c"
+      }
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "go", "c"] }, "expected": true },
+      { "data": { "tags": ["c", "go", "ruby"] }, "expected": false },
+      { "data": { "tags": { "0": "ruby", "-1": "c" } }, "expected": true },
+      { "data": { "tags": [{ "0": "ruby", "-1": "c" }] }, "expected": false }
+    ]
+  },
+  {
+    "description": "leading zero key (01) is treated as element field, not array index",
+    "condition": {
+      "tags.01": "c"
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "c"] }, "expected": false },
+      { "data": { "tags": { "01": "c" } }, "expected": true },
+      { "data": { "tags": [{ "01": "c" }] }, "expected": true }
+    ]
+  },
+  {
+    "description": "negative zero key (-0) is treated as element field, not array index",
+    "condition": {
+      "tags.-0": "ruby"
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "c"] }, "expected": false },
+      { "data": { "tags": { "-0": "ruby" } }, "expected": true },
+      { "data": { "tags": [{ "-0": "ruby" }] }, "expected": true }
+    ]
+  },
+  {
+    "description": "multiline numeric-prefixed key (0\\nfoo) is treated as element field, not array index",
+    "condition": {
+      "tags.0\nfoo": "ruby"
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "c"] }, "expected": false },
+      { "data": { "tags": { "0\nfoo": "ruby" } }, "expected": true },
+      { "data": { "tags": [{ "0\nfoo": "ruby" }] }, "expected": true }
+    ]
+  }
+]

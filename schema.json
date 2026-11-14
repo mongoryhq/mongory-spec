@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mongoryhq/mongory-spec/schema.json",
+  "title": "Mongory Conformance Test Suite",
+  "description": "Cross-language conformance test fixture schema for Mongory query matchers.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["description", "condition"],
+    "additionalProperties": false,
+    "properties": {
+      "description": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Human-readable description of the test suite."
+      },
+      "condition": {
+        "type": "object",
+        "description": "Top-level Mongory query condition document."
+      },
+      "error": {
+        "type": "boolean",
+        "description": "When true, compiling/validating the condition must fail with a type/validation error."
+      },
+      "records": {
+        "type": "array",
+        "minItems": 1,
+        "description": "Test records to evaluate against the compiled condition (required when error is not true).",
+        "items": {
+          "type": "object",
+          "required": ["data", "expected"],
+          "additionalProperties": false,
+          "properties": {
+            "data": {
+              "description": "Input record (object, array, string, number, boolean, or null)."
+            },
+            "expected": {
+              "type": "boolean",
+              "description": "Expected match result."
+            }
+          }
+        }
+      }
+    },
+    "oneOf": [
+      {
+        "required": ["records"],
+        "properties": {
+          "error": { "const": false }
+        }
+      },
+      {
+        "required": ["error"],
+        "properties": {
+          "error": { "const": true }
+        }
+      }
+    ]
+  }
+}

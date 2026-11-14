@@ -1,0 +1,84 @@
+[
+  {
+    "description": "operator $gt with integer and float",
+    "condition": {
+      "age": { "$gt": 30 }
+    },
+    "records": [
+      { "data": { "age": 40 }, "expected": true },
+      { "data": { "age": 30.5 }, "expected": true },
+      { "data": { "age": 30 }, "expected": false },
+      { "data": { "age": 30.0 }, "expected": false },
+      { "data": { "age": 20 }, "expected": false },
+      { "data": { "age": "40" }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $gte with integer and float",
+    "condition": {
+      "age": { "$gte": 30 }
+    },
+    "records": [
+      { "data": { "age": 40 }, "expected": true },
+      { "data": { "age": 30 }, "expected": true },
+      { "data": { "age": 30.0 }, "expected": true },
+      { "data": { "age": 29.9 }, "expected": false },
+      { "data": { "age": 20 }, "expected": false },
+      { "data": { "age": "30" }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $lt with integer and float",
+    "condition": {
+      "age": { "$lt": 30 }
+    },
+    "records": [
+      { "data": { "age": 20 }, "expected": true },
+      { "data": { "age": 29.5 }, "expected": true },
+      { "data": { "age": 30 }, "expected": false },
+      { "data": { "age": 30.0 }, "expected": false },
+      { "data": { "age": 40 }, "expected": false },
+      { "data": { "age": "20" }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $lte with integer and float",
+    "condition": {
+      "age": { "$lte": 30 }
+    },
+    "records": [
+      { "data": { "age": 20 }, "expected": true },
+      { "data": { "age": 30 }, "expected": true },
+      { "data": { "age": 30.0 }, "expected": true },
+      { "data": { "age": 30.1 }, "expected": false },
+      { "data": { "age": 40 }, "expected": false },
+      { "data": { "age": "20" }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $gt and $lt lexicographical string comparison",
+    "condition": {
+      "id": {
+        "$gt": "6760ff3335bacb003bfb43ef",
+        "$lte": "67d3def21177ff005e59e0a4"
+      }
+    },
+    "records": [
+      { "data": { "id": "67d3def21177ff005e59e0a4" }, "expected": true },
+      { "data": { "id": "67a000000000000000000000" }, "expected": true },
+      { "data": { "id": "6760ff3335bacb003bfb43ef" }, "expected": false },
+      { "data": { "id": "670000000000000000000000" }, "expected": false },
+      { "data": { "id": "680000000000000000000000" }, "expected": false },
+      { "data": { "id": 12345 }, "expected": false }
+    ]
+  }
+]

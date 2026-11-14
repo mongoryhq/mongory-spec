@@ -1,0 +1,72 @@
+[
+  {
+    "description": "operator $in with numbers",
+    "condition": {
+      "age": {
+        "$in": [30, 40]
+      }
+    },
+    "records": [
+      { "data": { "age": 30 }, "expected": true },
+      { "data": { "age": 30.0 }, "expected": true },
+      { "data": { "age": 40 }, "expected": true },
+      { "data": { "age": 20 }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $in with strings and array intersection",
+    "condition": {
+      "name": {
+        "$in": ["foo", "bar"]
+      }
+    },
+    "records": [
+      { "data": { "name": "foo" }, "expected": true },
+      { "data": { "name": "bar" }, "expected": true },
+      { "data": { "name": ["foo"] }, "expected": true },
+      { "data": { "name": ["bar"] }, "expected": true },
+      { "data": { "name": ["foo", "bar"] }, "expected": true },
+      { "data": { "name": ["baz", "foo"] }, "expected": true },
+      { "data": { "name": ["baz", "qux"] }, "expected": false },
+      { "data": { "name": "lala" }, "expected": false },
+      { "data": { "name": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $nin with numbers",
+    "condition": {
+      "age": {
+        "$nin": [30, 40]
+      }
+    },
+    "records": [
+      { "data": { "age": 20 }, "expected": true },
+      { "data": { "age": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "age": 30 }, "expected": false },
+      { "data": { "age": 30.0 }, "expected": false },
+      { "data": { "age": 40 }, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $nin with strings and array disjoint check",
+    "condition": {
+      "name": {
+        "$nin": ["foo", "bar"]
+      }
+    },
+    "records": [
+      { "data": { "name": "ann" }, "expected": true },
+      { "data": { "name": ["ann", "baz"] }, "expected": true },
+      { "data": { "name": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "name": "foo" }, "expected": false },
+      { "data": { "name": "bar" }, "expected": false },
+      { "data": { "name": ["ann", "foo"] }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  }
+]

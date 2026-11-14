@@ -1,0 +1,57 @@
+[
+  {
+    "description": "operator $size exact integer match",
+    "condition": {
+      "tags": {
+        "$size": 3
+      }
+    },
+    "records": [
+      { "data": { "tags": ["a", "b", "c"] }, "expected": true },
+      { "data": { "tags": ["a", "b"] }, "expected": false },
+      { "data": { "tags": ["a", "b", "c", "d"] }, "expected": false },
+      { "data": { "tags": [] }, "expected": false },
+      { "data": { "tags": "abc" }, "expected": false },
+      { "data": { "tags": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $size with nested range condition",
+    "condition": {
+      "tags": {
+        "$size": {
+          "$gte": 1,
+          "$lte": 3
+        }
+      }
+    },
+    "records": [
+      { "data": { "tags": ["a", "b", "c"] }, "expected": true },
+      { "data": { "tags": ["a"] }, "expected": true },
+      { "data": { "tags": ["a", "b", "c", "d"] }, "expected": false },
+      { "data": { "tags": [] }, "expected": false },
+      { "data": { "tags": "alaalala" }, "expected": false },
+      { "data": { "tags": null }, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $size combined with $present on array field",
+    "condition": {
+      "abilities.$size.$lte": 2,
+      "abilities": { "$present": true }
+    },
+    "records": [
+      {
+        "data": {
+          "abilities": [
+            { "name": "attack", "power": 10 },
+            { "name": "attack", "power": 59 }
+          ]
+        },
+        "expected": true
+      },
+      { "data": { "abilities": [] }, "expected": false }
+    ]
+  }
+]

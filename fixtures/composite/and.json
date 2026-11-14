@@ -1,0 +1,101 @@
+[
+  {
+    "description": "top-level $and with basic field conditions",
+    "condition": {
+      "$and": [
+        { "name": "John" },
+        { "age": 30 }
+      ]
+    },
+    "records": [
+      { "data": { "name": "John", "age": 30 }, "expected": true },
+      { "data": { "name": "Frank", "age": 30 }, "expected": false },
+      { "data": { "name": "John", "age": 20 }, "expected": false }
+    ]
+  },
+  {
+    "description": "top-level empty $and matches everything",
+    "condition": {
+      "$and": []
+    },
+    "records": [
+      { "data": {}, "expected": true },
+      { "data": [], "expected": true },
+      { "data": "lalala", "expected": true }
+    ]
+  },
+  {
+    "description": "top-level $and with multiple complex conditions",
+    "condition": {
+      "$and": [
+        {
+          "name": "John",
+          "age": 30
+        },
+        {
+          "tags": "engineer",
+          "salary": { "$gt": 100000 }
+        }
+      ]
+    },
+    "records": [
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "tags": ["engineer", "developer"],
+          "salary": 200000
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "tags": ["developer", "engineer"],
+          "salary": 100000
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "name": "John",
+          "age": 30,
+          "tags": ["developer"],
+          "salary": 100000
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "name": "Frank",
+          "age": 30,
+          "tags": ["developer", "architect", "programmer", "engineer"],
+          "salary": 100000
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "nested field-level $and",
+    "condition": {
+      "profile": {
+        "$and": [
+          { "name": "Joy" },
+          { "age": 18 }
+        ]
+      }
+    },
+    "records": [
+      { "data": { "profile": { "name": "Joy", "age": 18 } }, "expected": true },
+      { "data": { "profile": { "name": "Joy", "age": 20 } }, "expected": false },
+      { "data": { "profile": { "name": "Frank", "age": 18 } }, "expected": false },
+      { "data": { "profile": {} }, "expected": false },
+      { "data": { "profile": null }, "expected": false },
+      { "data": { "name": "Joy", "age": 18 }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  }
+]

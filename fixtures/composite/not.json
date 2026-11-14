@@ -1,0 +1,35 @@
+[
+  {
+    "description": "operator $not negating nested regex condition",
+    "condition": {
+      "profile": {
+        "$not": {
+          "name": { "$regex": "an" }
+        }
+      }
+    },
+    "records": [
+      { "data": { "profile": { "name": "Oreo" } }, "expected": true },
+      { "data": { "profile": { "name": null } }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "profile": { "name": "Frank" } }, "expected": false },
+      { "data": { "profile": { "name": "angular" } }, "expected": false },
+      { "data": "non-object", "expected": false }
+    ]
+  },
+  {
+    "description": "operator $not negating comparison operator",
+    "condition": {
+      "age": {
+        "$not": { "$gt": 18 }
+      }
+    },
+    "records": [
+      { "data": { "age": 18 }, "expected": true },
+      { "data": { "age": 12 }, "expected": true },
+      { "data": { "age": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "age": 25 }, "expected": false }
+    ]
+  }
+]

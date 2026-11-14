@@ -1,0 +1,111 @@
+[
+  {
+    "description": "operator $eq with integer",
+    "condition": {
+      "age": { "$eq": 30 }
+    },
+    "records": [
+      { "data": { "age": 30 }, "expected": true },
+      { "data": { "age": 30.0 }, "expected": true },
+      { "data": { "age": 20 }, "expected": false },
+      { "data": { "age": "30" }, "expected": false },
+      { "data": { "age": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $eq with string",
+    "condition": {
+      "name": { "$eq": "Frank" }
+    },
+    "records": [
+      { "data": { "name": "Frank" }, "expected": true },
+      { "data": { "name": "frank" }, "expected": false },
+      { "data": { "name": null }, "expected": false },
+      { "data": {}, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $eq with boolean",
+    "condition": {
+      "active": { "$eq": true }
+    },
+    "records": [
+      { "data": { "active": true }, "expected": true },
+      { "data": { "active": false }, "expected": false },
+      { "data": { "active": 1 }, "expected": false },
+      { "data": { "active": "true" }, "expected": false },
+      { "data": { "active": null }, "expected": false }
+    ]
+  },
+  {
+    "description": "literal null condition matches both explicit null and missing key on existing object",
+    "condition": {
+      "name": null
+    },
+    "records": [
+      { "data": { "name": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "name": "Oreo" }, "expected": false },
+      { "data": { "name": false }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $eq with null matches explicit null but not missing key",
+    "condition": {
+      "name": { "$eq": null }
+    },
+    "records": [
+      { "data": { "name": null }, "expected": true },
+      { "data": {}, "expected": false },
+      { "data": { "name": "Oreo" }, "expected": false },
+      { "data": { "name": false }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $ne with integer",
+    "condition": {
+      "age": { "$ne": 30 }
+    },
+    "records": [
+      { "data": { "age": 30 }, "expected": false },
+      { "data": { "age": 30.0 }, "expected": false },
+      { "data": { "age": 20 }, "expected": true },
+      { "data": { "age": 40 }, "expected": true },
+      { "data": { "age": "30" }, "expected": true },
+      { "data": { "age": null }, "expected": true },
+      { "data": {}, "expected": true }
+    ]
+  },
+  {
+    "description": "operator $ne with null",
+    "condition": {
+      "name": { "$ne": null }
+    },
+    "records": [
+      { "data": { "name": "Oreo" }, "expected": true },
+      { "data": { "name": false }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "name": null }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $eq with object (key order independent)",
+    "condition": {
+      "meta": {
+        "$eq": { "a": 1, "b": "x" }
+      }
+    },
+    "records": [
+      { "data": { "meta": { "a": 1, "b": "x" } }, "expected": true },
+      { "data": { "meta": { "b": "x", "a": 1 } }, "expected": true },
+      { "data": { "meta": { "a": 1, "b": "y" } }, "expected": false },
+      { "data": { "meta": { "a": 1, "b": "x", "c": 2 } }, "expected": false },
+      { "data": { "meta": { "a": 1 } }, "expected": false }
+    ]
+  }
+]

@@ -1,0 +1,244 @@
+[
+  {
+    "description": "top-level $elemMatch with simple field condition",
+    "condition": {
+      "$elemMatch": {
+        "name": "John"
+      }
+    },
+    "records": [
+      {
+        "data": [
+          { "name": "John", "age": 30 },
+          { "name": "Frank", "age": 25 }
+        ],
+        "expected": true
+      },
+      {
+        "data": [
+          { "name": "Frank", "age": 30 },
+          { "name": "Alice", "age": 25 }
+        ],
+        "expected": false
+      },
+      { "data": [], "expected": false },
+      { "data": { "name": "John", "age": 30 }, "expected": false },
+      { "data": "not an array", "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with multiple field conditions",
+    "condition": {
+      "$elemMatch": {
+        "name": "John",
+        "age": 30,
+        "title": "engineer"
+      }
+    },
+    "records": [
+      {
+        "data": [
+          { "name": "John", "age": 30, "title": "engineer" },
+          { "name": "Frank", "age": 25, "title": "designer" }
+        ],
+        "expected": true
+      },
+      {
+        "data": [
+          { "name": "John", "age": 30, "title": "designer" },
+          { "name": "Frank", "age": 25, "title": "engineer" }
+        ],
+        "expected": false
+      },
+      {
+        "data": [
+          { "name": "John", "age": 25, "title": "engineer" },
+          { "name": "Alice", "age": 30, "title": "engineer" }
+        ],
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with range operators",
+    "condition": {
+      "$elemMatch": {
+        "score": {
+          "$gte": 80,
+          "$lte": 90
+        }
+      }
+    },
+    "records": [
+      {
+        "data": [
+          { "name": "John", "score": 85 },
+          { "name": "Frank", "score": 75 }
+        ],
+        "expected": true
+      },
+      {
+        "data": [
+          { "name": "John", "score": 95 },
+          { "name": "Frank", "score": 70 }
+        ],
+        "expected": false
+      },
+      {
+        "data": [
+          { "name": "Alice", "score": 80 },
+          { "name": "Bob", "score": 90 }
+        ],
+        "expected": true
+      }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with nested object conditions",
+    "condition": {
+      "$elemMatch": {
+        "address": { "city": "Taipei" },
+        "age": { "$gt": 25 }
+      }
+    },
+    "records": [
+      {
+        "data": [
+          {
+            "name": "John",
+            "age": 30,
+            "address": { "city": "Taipei", "street": "Main St" }
+          },
+          {
+            "name": "Frank",
+            "age": 25,
+            "address": { "city": "New York" }
+          }
+        ],
+        "expected": true
+      },
+      {
+        "data": [
+          {
+            "name": "John",
+            "age": 20,
+            "address": { "city": "Taipei" }
+          },
+          {
+            "name": "Frank",
+            "age": 30,
+            "address": { "city": "New York" }
+          }
+        ],
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with existence operators",
+    "condition": {
+      "$elemMatch": {
+        "name": { "$exists": true },
+        "email": { "$exists": false }
+      }
+    },
+    "records": [
+      {
+        "data": [
+          { "name": "John", "age": 30 },
+          { "name": "Frank", "email": "frank@example.com" }
+        ],
+        "expected": true
+      },
+      {
+        "data": [
+          { "name": "John", "email": "john@example.com" },
+          { "age": 30 }
+        ],
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "field-level $elemMatch with nested $or",
+    "condition": {
+      "abilities": {
+        "$elemMatch": {
+          "$or": [
+            { "name": "attack" },
+            { "name": "healing" },
+            { "power": { "$gt": 60 } }
+          ]
+        }
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "abilities": [
+            { "name": "attack", "power": 10 },
+            { "name": "eat", "power": 59 }
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "abilities": [
+            { "name": "healing", "power": 30 },
+            { "name": "run", "power": 40 }
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "abilities": [
+            { "name": "cooking", "power": 70 },
+            { "name": "drink", "power": 10 }
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "abilities": [
+            { "name": "eat", "power": 59 },
+            { "name": "run", "power": 40 }
+          ]
+        },
+        "expected": false
+      },
+      { "data": { "abilities": [] }, "expected": false },
+      { "data": { "abilities": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with empty condition matches non-empty arrays only",
+    "condition": {
+      "$elemMatch": {}
+    },
+    "records": [
+      { "data": [{ "name": "John" }], "expected": true },
+      { "data": [{}], "expected": true },
+      { "data": [], "expected": false },
+      { "data": { "name": "John" }, "expected": false },
+      { "data": "not an array", "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "top-level $elemMatch with numeric key does not match non-array object",
+    "condition": {
+      "$elemMatch": {
+        "0": "name"
+      }
+    },
+    "records": [
+      { "data": [["name", "John"]], "expected": true },
+      { "data": { "name": "John" }, "expected": false }
+    ]
+  }
+]
