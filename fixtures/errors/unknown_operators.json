@@ -1,0 +1,78 @@
+[
+  {
+    "description": "unknown top-level operator raises error",
+    "condition": {
+      "$foo": 1
+    },
+    "error": true
+  },
+  {
+    "description": "unknown field-level operator raises error",
+    "condition": {
+      "age": {
+        "$foo": 1
+      }
+    },
+    "error": true
+  },
+  {
+    "description": "unknown operator in dotted key raises error",
+    "condition": {
+      "age.$foo": 1
+    },
+    "error": true
+  },
+  {
+    "description": "unknown operator nested in $and raises error",
+    "condition": {
+      "$and": [
+        {
+          "age": {
+            "$foo": 1
+          }
+        }
+      ]
+    },
+    "error": true
+  },
+  {
+    "description": "unknown operator inside $elemMatch raises error",
+    "condition": {
+      "items": {
+        "$elemMatch": {
+          "$foo": 1
+        }
+      }
+    },
+    "error": true
+  },
+  {
+    "description": "$options without $regex raises error",
+    "condition": {
+      "name": {
+        "$options": "i"
+      }
+    },
+    "error": true
+  },
+  {
+    "description": "$options with unsupported flag raises error",
+    "condition": {
+      "name": {
+        "$regex": "a",
+        "$options": "x"
+      }
+    },
+    "error": true
+  },
+  {
+    "description": "$options with non-string value raises error",
+    "condition": {
+      "name": {
+        "$regex": "a",
+        "$options": 1
+      }
+    },
+    "error": true
+  }
+]

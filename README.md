@@ -2,7 +2,7 @@
 
 Cross-language conformance test specifications for **Mongory** implementations (`mongory-rb`, `mongory-core`, `mongory-go`, `mongory-js`, etc.).
 
-Current Spec Version: **`0.1.0`** (see [`VERSION`](./VERSION))
+Current Spec Version: **`0.2.0`** (see [`VERSION`](./VERSION))
 
 ---
 
@@ -34,9 +34,11 @@ mongory-spec/
     │   ├── every.json               # $every
     │   └── size.json                # $size (exact integer & nested range operators)
     ├── regex/
-    │   └── regex.json               # $regex (cross-engine common regex subset)
+    │   ├── regex.json               # $regex (cross-engine common regex subset)
+    │   └── options.json             # $regex with $options (i, m, s)
     └── errors/
-        └── invalid_conditions.json  # Invalid operator conditions ("error": true)
+        ├── invalid_conditions.json  # Invalid operator conditions ("error": true)
+        └── unknown_operators.json   # Unknown "$" operators and misplaced $options ("error": true)
 ```
 
 ---
@@ -127,6 +129,23 @@ To guarantee identical behavior across **RE2** (Go), **PCRE2** (C), **Oniguruma*
   - Lookaround assertions (`(?=...)`, `(?!...)`, `(?<=...)`, `(?<!...)`)
   - Atomic groups / possessive quantifiers (`(?>...)`, `++`)
   - Conditional patterns and recursion
+
+### 3.5 Regex Options (`$options`)
+`$options` is a sibling key of `$regex` in the same condition object (`{ "$regex": "^ab", "$options": "i" }`), as in MongoDB. It is a string of flags:
+- `i`: case-insensitive matching.
+- `m`: `^` and `$` also match at line boundaries.
+- `s`: `.` also matches a newline.
+
+Compiling a condition MUST fail when:
+- `$options` is not a string, or contains a flag other than `i`, `m`, `s` (MongoDB's `x` and `u` are not in the cross-engine subset).
+- `$options` appears without a sibling `$regex`.
+
+On an array field, `$options` travels with `$regex` into the implicit `$elemMatch` (see 3.3).
+
+Anchor behavior on strings containing newlines **without** `m` is engine-dependent (Ruby's `^`/`$` always match at line boundaries) and is not covered by the spec.
+
+### 3.6 Operator Validation
+A condition key that starts with `$` and is not a supported operator MUST fail compilation, as MongoDB rejects unknown operators. This applies at any depth, including keys produced by dot-notation expansion (`"age.$foo"` expands to `{ "age": { "$foo": ... } }`). A key with `$` anywhere else (`"price$"`) is a regular field name.
 
 ---
 

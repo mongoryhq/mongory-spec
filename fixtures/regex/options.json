@@ -1,0 +1,195 @@
+[
+  {
+    "description": "$options i makes $regex case-insensitive",
+    "condition": {
+      "name": {
+        "$regex": "^ab",
+        "$options": "i"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "name": "ABC"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "abc"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "xab"
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "name": null
+        },
+        "expected": false
+      },
+      {
+        "data": {},
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "$regex without $options is case-sensitive",
+    "condition": {
+      "name": {
+        "$regex": "^ab"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "name": "abc"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "name": "ABC"
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "$options s lets dot match newline",
+    "condition": {
+      "text": {
+        "$regex": "a.b",
+        "$options": "s"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "text": "a\nb"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "text": "axb"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "text": "ab"
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "dot does not match newline without $options s",
+    "condition": {
+      "text": {
+        "$regex": "a.b"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "text": "a\nb"
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "text": "axb"
+        },
+        "expected": true
+      }
+    ]
+  },
+  {
+    "description": "$options m lets anchors match at line boundaries",
+    "condition": {
+      "text": {
+        "$regex": "^b$",
+        "$options": "m"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "text": "a\nb\nc"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "text": "abc"
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "combined $options flags",
+    "condition": {
+      "text": {
+        "$regex": "^B.C$",
+        "$options": "ims"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "text": "a\nb\nc"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "text": "x\nbyc"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "text": "bc"
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "$options applies inside implicit $elemMatch on array field",
+    "condition": {
+      "tags": {
+        "$regex": "^ru",
+        "$options": "i"
+      }
+    },
+    "records": [
+      {
+        "data": {
+          "tags": [
+            "go",
+            "RUBY"
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "tags": [
+            "go",
+            "c"
+          ]
+        },
+        "expected": false
+      }
+    ]
+  }
+]
