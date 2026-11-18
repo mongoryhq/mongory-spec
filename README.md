@@ -2,7 +2,7 @@
 
 Cross-language conformance test specifications for **Mongory** implementations (`mongory-rb`, `mongory-core`, `mongory-go`, `mongory-js`, etc.).
 
-Current Spec Version: **`0.2.0`** (see [`VERSION`](./VERSION))
+Current Spec Version: **`0.2.1`** (see [`VERSION`](./VERSION))
 
 ---
 
@@ -22,7 +22,7 @@ mongory-spec/
     │   └── gt_gte_lt_lte.json       # $gt, $gte, $lt, $lte (numeric, string, incomparable types)
     ├── inclusion/
     │   └── in_nin.json              # $in, $nin (scalars, array intersection semantics, null)
-    ├── existance/
+    ├── existence/
     │   └── exists_present.json      # $exists, $present (missing key vs null vs empty values)
     ├── composite/
     │   ├── and.json                 # $and (top-level & field-level)
@@ -146,6 +146,17 @@ Anchor behavior on strings containing newlines **without** `m` is engine-depende
 
 ### 3.6 Operator Validation
 A condition key that starts with `$` and is not a supported operator MUST fail compilation, as MongoDB rejects unknown operators. This applies at any depth, including keys produced by dot-notation expansion (`"age.$foo"` expands to `{ "age": { "$foo": ... } }`). A key with `$` anywhere else (`"price$"`) is a regular field name.
+
+### 3.7 Differences from MongoDB Query Syntax
+Mongory is **MongoDB-inspired** for in-memory rule evaluation and differs intentionally from MongoDB Server in the following areas:
+
+| Area | Mongory Behavior | MongoDB Server Behavior |
+|------|-----------------|-------------------------|
+| **`$every`** | Built-in array quantifier; requires **all** elements to match and returns `false` on empty arrays `[]` (no vacuous truth). | Not a native query operator (requires `$not` + `$elemMatch` or `$expr`/`$allElementsTrue`). |
+| **`$present`** | Built-in presence check (ActiveSupport-style): `false` for missing key, `null`, `false`, `""`, `[]`, and `{}`; `true` for numbers (including `0`) and non-empty strings/arrays/objects. | Not a native operator. |
+| **`$regex` / `$options`** | Restricted to the cross-engine regex subset (`^`, `$`, character classes, quantifiers, alternation/groups) and flags `i`, `m`, `s`. | Supports full PCRE2 extensions and additional flags such as `x` and `u`. |
+| **Operators outside the 17** | Unknown `$`-prefixed keys fail compilation. Aggregation (`$expr`), bitwise, geospatial, `$type`, `$mod`, `$text`, and update operators are excluded. | Supported in MongoDB query/aggregation pipelines. |
+| **In-memory evaluation extensions** | Supports priority-sorted sibling short-circuiting with dynamic re-sorting on lazy array matching, plus `explain` / `trace` debugging. | Query planner uses B-tree indexes / collection scans on persisted documents. |
 
 ---
 
