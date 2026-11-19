@@ -151,5 +151,18 @@
       { "data": { "tags": { "foo": 1 } }, "expected": false },
       { "data": { "tags": { "bar": 1 } }, "expected": true }
     ]
+  },
+  {
+    "description": "nested $exists false requires intermediate parent containers to exist",
+    "condition": {
+      "a.b.c": { "$exists": false }
+    },
+    "records": [
+      { "data": { "a": { "b": {} } }, "expected": true },
+      { "data": { "a": { "b": { "c": null } } }, "expected": false },
+      { "data": { "a": {} }, "expected": false },
+      { "data": { "a": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
   }
 ]
