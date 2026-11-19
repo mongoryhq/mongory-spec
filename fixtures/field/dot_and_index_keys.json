@@ -7,13 +7,25 @@
     "records": [
       {
         "data": {
-          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "No!" } } } } } } }
+          "do": {
+            "you": {
+              "want": {
+                "to": { "build": { "a": { "snow": { "man": "No!" } } } }
+              }
+            }
+          }
         },
         "expected": true
       },
       {
         "data": {
-          "do": { "you": { "want": { "to": { "build": { "a": { "snow": { "man": "Yes!" } } } } } } }
+          "do": {
+            "you": {
+              "want": {
+                "to": { "build": { "a": { "snow": { "man": "Yes!" } } } }
+              }
+            }
+          }
         },
         "expected": false
       },
@@ -113,6 +125,31 @@
       { "data": { "tags": ["ruby", "c"] }, "expected": false },
       { "data": { "tags": { "0\nfoo": "ruby" } }, "expected": true },
       { "data": { "tags": [{ "0\nfoo": "ruby" }] }, "expected": true }
+    ]
+  },
+  {
+    "description": "out-of-bounds positive and negative array index evaluates as MISSING",
+    "condition": {
+      "tags.5": { "$exists": false },
+      "tags.-1": { "$nin": [1, 0] }
+    },
+    "records": [
+      { "data": { "tags": [] }, "expected": true },
+      { "data": { "tags": [2] }, "expected": true },
+      { "data": { "tags": [1] }, "expected": false },
+      { "data": { "tags": [2, 3, 4, 5, 6, 7] }, "expected": false }
+    ]
+  },
+  {
+    "description": "non-integer field key on array delegates to elements (fails on scalar elements, matches missing key on object elements)",
+    "condition": {
+      "tags.foo": { "$exists": false }
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "c"] }, "expected": false },
+      { "data": { "tags": [{ "bar": 1 }] }, "expected": true },
+      { "data": { "tags": { "foo": 1 } }, "expected": false },
+      { "data": { "tags": { "bar": 1 } }, "expected": true }
     ]
   }
 ]
