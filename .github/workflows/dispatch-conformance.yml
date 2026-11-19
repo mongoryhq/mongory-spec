@@ -1,0 +1,49 @@
+name: Dispatch downstream conformance
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      spec_ref:
+        description: "mongory-spec ref (tag, branch, or SHA) to pass downstream; defaults to tag or v$(cat VERSION)"
+        required: false
+        default: ""
+
+jobs:
+  dispatch:
+    name: Dispatch ${{ matrix.repo }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - mongory-core
+          - mongory-go
+          - mongory-js
+          - mongory-rb
+    steps:
+      - uses: actions/checkout@v4
+        if: github.event_name == 'workflow_dispatch' && inputs.spec_ref == ''
+
+      - name: Resolve spec_ref
+        id: ref
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "spec_ref=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          elif [[ -n "${{ inputs.spec_ref }}" ]]; then
+            echo "spec_ref=${{ inputs.spec_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "spec_ref=v$(tr -d '[:space:]' < VERSION)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger spec-conformance on mongoryhq/${{ matrix.repo }}
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          gh workflow run spec-conformance.yml \
+            --repo "mongoryhq/${{ matrix.repo }}" \
+            --ref main \
+            -f "spec_ref=${{ steps.ref.outputs.spec_ref }}"
