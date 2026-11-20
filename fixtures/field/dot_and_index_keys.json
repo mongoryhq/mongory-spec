@@ -164,5 +164,29 @@
       { "data": { "a": null }, "expected": false },
       { "data": {}, "expected": false }
     ]
+  },
+  {
+    "description": "dotted key colliding with parent scalar or array key preserves both conditions",
+    "condition": {
+      "a.b": false,
+      "a": [1, 2]
+    },
+    "records": [
+      { "data": { "a": [1, 2] }, "expected": false },
+      { "data": { "a": { "b": false } }, "expected": false },
+      { "data": { "a": [{ "b": false }, [1, 2]] }, "expected": true }
+    ]
+  },
+  {
+    "description": "empty string field key is a valid JSON object key",
+    "condition": {
+      "": { "$in": [1, "ok"] }
+    },
+    "records": [
+      { "data": { "": 1 }, "expected": true },
+      { "data": { "": "ok" }, "expected": true },
+      { "data": { "": 2 }, "expected": false },
+      { "data": { "a": 1 }, "expected": false }
+    ]
   }
 ]

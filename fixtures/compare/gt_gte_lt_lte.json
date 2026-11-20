@@ -80,5 +80,25 @@
       { "data": { "id": "680000000000000000000000" }, "expected": false },
       { "data": { "id": 12345 }, "expected": false }
     ]
+  },
+  {
+    "description": "ordering operators ($gt/$gte/$lt/$lte) return false for non-orderable types (null, bool, array, object)",
+    "condition": {
+      "$or": [
+        { "a": { "$lte": null } },
+        { "a": { "$gte": null } },
+        { "b": { "$gte": [null] } },
+        { "c": { "$lte": true } },
+        { "d": { "$gte": { "x": 1 } } }
+      ]
+    },
+    "records": [
+      { "data": { "a": null }, "expected": false },
+      { "data": { "b": [[1], [2]] }, "expected": false },
+      { "data": { "b": [null] }, "expected": false },
+      { "data": { "c": true }, "expected": false },
+      { "data": { "c": false }, "expected": false },
+      { "data": { "d": { "x": 1 } }, "expected": false }
+    ]
   }
 ]
