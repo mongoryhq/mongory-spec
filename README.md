@@ -1,6 +1,9 @@
 # mongory-spec
 
-Cross-language conformance test specifications for **Mongory** implementations (`mongory-rb`, `mongory-core`, `mongory-go`, `mongory-js`, etc.).
+[![Spec Version](https://img.shields.io/github/v/tag/mongoryhq/mongory-spec?label=spec)](https://github.com/mongoryhq/mongory-spec/tags)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Cross-language conformance test specifications for **Mongory** implementations (`mongory-rb`, `mongory-core`, `mongory-go`, `mongory-js`, `mongory-py`).
 
 Current Spec Version: **`0.2.1`** (see [`VERSION`](./VERSION))
 
