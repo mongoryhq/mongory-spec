@@ -1,0 +1,186 @@
+[
+  {
+    "description": "real-world promotion eligibility rule ($and, $or, $in >= 16, $elemMatch, nested fields)",
+    "condition": {
+      "status": "active",
+      "age": { "$gte": 18 },
+      "profile.country": {
+        "$in": [
+          "TW", "JP", "KR", "SG", "HK", "US", "CA", "GB",
+          "DE", "FR", "NL", "AU", "NZ", "SE", "NO", "DK", "FI"
+        ]
+      },
+      "$or": [
+        { "tier": "vip" },
+        {
+          "cart": {
+            "$elemMatch": {
+              "category": "electronics",
+              "price": { "$gte": 50 }
+            }
+          }
+        }
+      ],
+      "banned": { "$ne": true }
+    },
+    "records": [
+      {
+        "data": {
+          "status": "active",
+          "age": 28,
+          "profile": { "country": "TW" },
+          "tier": "vip",
+          "cart": [],
+          "banned": false
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "status": "active",
+          "age": 22,
+          "profile": { "country": "JP" },
+          "tier": "free",
+          "cart": [
+            { "category": "books", "price": 80 },
+            { "category": "electronics", "price": 65 }
+          ]
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "status": "active",
+          "age": 22,
+          "profile": { "country": "JP" },
+          "tier": "free",
+          "cart": [
+            { "category": "electronics", "price": 20 },
+            { "category": "books", "price": 100 }
+          ]
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "status": "active",
+          "age": 17,
+          "profile": { "country": "TW" },
+          "tier": "vip",
+          "cart": []
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "status": "active",
+          "age": 30,
+          "profile": { "country": "BR" },
+          "tier": "vip",
+          "cart": []
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "status": "active",
+          "age": 30,
+          "profile": { "country": "US" },
+          "tier": "vip",
+          "banned": true
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "real-world webhook routing rule ($regex, implicit array, $or, $exists, dot path)",
+    "condition": {
+      "event.type": { "$regex": "^order\\.(created|paid)$" },
+      "payload.tags": "priority",
+      "$or": [
+        { "payload.retry_count": { "$exists": false } },
+        { "payload.retry_count": { "$lt": 3 } }
+      ]
+    },
+    "records": [
+      {
+        "data": {
+          "event": { "type": "order.created" },
+          "payload": { "tags": ["web", "priority"] }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "event": { "type": "order.paid" },
+          "payload": { "tags": ["priority"], "retry_count": 2 }
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "event": { "type": "order.paid" },
+          "payload": { "tags": ["priority"], "retry_count": 3 }
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "event": { "type": "order.refunded" },
+          "payload": { "tags": ["priority"], "retry_count": 0 }
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "event": { "type": "order.created" },
+          "payload": { "tags": ["standard"], "retry_count": 0 }
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "real-world feature rollout rule ($every, $size, $not + $regex)",
+    "condition": {
+      "devices": { "$every": { "version": { "$gte": 2 } } },
+      "roles": { "$size": 2 },
+      "email": { "$not": { "$regex": "\\+test@" } }
+    },
+    "records": [
+      {
+        "data": {
+          "devices": [{ "version": 2 }, { "version": 3 }],
+          "roles": ["member", "beta"],
+          "email": "alice@example.com"
+        },
+        "expected": true
+      },
+      {
+        "data": {
+          "devices": [{ "version": 2 }, { "version": 1 }],
+          "roles": ["member", "beta"],
+          "email": "alice@example.com"
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "devices": [{ "version": 2 }],
+          "roles": ["member"],
+          "email": "alice@example.com"
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "devices": [{ "version": 2 }],
+          "roles": ["member", "beta"],
+          "email": "alice+test@example.com"
+        },
+        "expected": false
+      }
+    ]
+  }
+]

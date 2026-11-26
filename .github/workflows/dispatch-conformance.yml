@@ -22,6 +22,7 @@ jobs:
           - mongory-core
           - mongory-go
           - mongory-js
+          - mongory-py
           - mongory-rb
     steps:
       - uses: actions/checkout@v4

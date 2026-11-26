@@ -68,5 +68,62 @@
       { "data": { "name": ["ann", "foo"] }, "expected": false },
       { "data": null, "expected": false }
     ]
+  },
+  {
+    "description": "operator $in with large list (>= 16 items, hash fast-path parity)",
+    "condition": {
+      "v": {
+        "$in": [
+          "item_01", "item_02", "item_03", "item_04",
+          "item_05", "item_06", "item_07", "item_08",
+          "item_09", "item_10", "item_11", "item_12",
+          "item_13", "item_14", "item_15", "item_16",
+          0, 1, 42
+        ]
+      }
+    },
+    "records": [
+      { "data": { "v": "item_01" }, "expected": true },
+      { "data": { "v": "item_16" }, "expected": true },
+      { "data": { "v": "item_99" }, "expected": false },
+      { "data": { "v": 0 }, "expected": true },
+      { "data": { "v": 0.0 }, "expected": true },
+      { "data": { "v": 1 }, "expected": true },
+      { "data": { "v": 1.0 }, "expected": true },
+      { "data": { "v": 42.0 }, "expected": true },
+      { "data": { "v": true }, "expected": false },
+      { "data": { "v": false }, "expected": false },
+      { "data": { "v": "1" }, "expected": false },
+      { "data": { "v": ["miss", "item_12"] }, "expected": true },
+      { "data": { "v": ["miss", "other"] }, "expected": false },
+      { "data": { "v": null }, "expected": false },
+      { "data": {}, "expected": false }
+    ]
+  },
+  {
+    "description": "operator $nin with large list (>= 16 items, hash fast-path parity)",
+    "condition": {
+      "v": {
+        "$nin": [
+          "item_01", "item_02", "item_03", "item_04",
+          "item_05", "item_06", "item_07", "item_08",
+          "item_09", "item_10", "item_11", "item_12",
+          "item_13", "item_14", "item_15", "item_16",
+          0, 1, 42
+        ]
+      }
+    },
+    "records": [
+      { "data": { "v": "item_05" }, "expected": false },
+      { "data": { "v": "item_99" }, "expected": true },
+      { "data": { "v": 1.0 }, "expected": false },
+      { "data": { "v": 0.0 }, "expected": false },
+      { "data": { "v": true }, "expected": true },
+      { "data": { "v": false }, "expected": true },
+      { "data": { "v": ["ok", "item_16"] }, "expected": false },
+      { "data": { "v": ["ok", "fine"] }, "expected": true },
+      { "data": { "v": null }, "expected": true },
+      { "data": {}, "expected": true }
+    ]
   }
 ]

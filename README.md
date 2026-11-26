@@ -5,7 +5,7 @@
 
 Cross-language conformance test specifications for **Mongory** implementations (`mongory-rb`, `mongory-core`, `mongory-go`, `mongory-js`, `mongory-py`).
 
-Current Spec Version: **`0.2.1`** (see [`VERSION`](./VERSION))
+Current Spec Version: **`0.2.2`** (see [`VERSION`](./VERSION))
 
 ---
 
@@ -24,13 +24,14 @@ mongory-spec/
     │   ├── eq_ne.json               # $eq, $ne (scalars, int/float cross-type, null, objects, arrays)
     │   └── gt_gte_lt_lte.json       # $gt, $gte, $lt, $lte (numeric, string, incomparable types)
     ├── inclusion/
-    │   └── in_nin.json              # $in, $nin (scalars, array intersection semantics, null)
+    │   └── in_nin.json              # $in, $nin (scalars, array intersection, null, large >= 16 hash parity)
     ├── existence/
     │   └── exists_present.json      # $exists, $present (missing key vs null vs empty values)
     ├── composite/
     │   ├── and.json                 # $and (top-level & field-level)
     │   ├── or.json                  # $or (top-level & field-level)
-    │   └── not.json                 # $not (negation of subconditions)
+    │   ├── not.json                 # $not (negation of subconditions)
+    │   └── real_world_rules.json    # Multi-operator end-to-end rules (promotions, webhooks, feature flags)
     ├── array/
     │   ├── implicit_array.json      # MongoDB-aligned implicit array matching (scalar, range, $eq/$ne, object array)
     │   ├── elem_match.json          # $elemMatch
