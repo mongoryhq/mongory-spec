@@ -121,7 +121,7 @@ When a field's value in a record is an **Array**:
    - `$ne` is the strict negation of `$eq`: it returns `false` if the array itself equals the target value **OR** any element in the array equals the target value; otherwise `true`.
 
 ### 3.4 Official Cross-Engine Regex Subset (`$regex`)
-To guarantee identical behavior across **RE2** (Go), **PCRE2** (C), **Oniguruma** (Ruby), and **ECMA-262 RegExp** (JS), `mongory-spec` restricts `$regex` patterns to the common regular expression subset:
+To guarantee identical behavior across **RE2** (Go), **PCRE2** (C), **Oniguruma** (Ruby), **Python `re`**, and **ECMA-262 RegExp** (JS), `mongory-spec` restricts `$regex` patterns to the common regular expression subset:
 - **Supported**:
   - Anchors: `^`, `$`
   - Character classes: `.`, `[abc]`, `[^abc]`, `[a-z]`, `\d`, `\D`, `\w`, `\W`, `\s`, `\S`
@@ -161,6 +161,18 @@ Mongory is **MongoDB-inspired** for in-memory rule evaluation and differs intent
 | **`$regex` / `$options`** | Restricted to the cross-engine regex subset (`^`, `$`, character classes, quantifiers, alternation/groups) and flags `i`, `m`, `s`. | Supports full PCRE2 extensions and additional flags such as `x` and `u`. |
 | **Operators outside the 17** | Unknown `$`-prefixed keys fail compilation. Aggregation (`$expr`), bitwise, geospatial, `$type`, `$mod`, `$text`, and update operators are excluded. | Supported in MongoDB query/aggregation pipelines. |
 | **In-memory evaluation extensions** | Supports priority-sorted sibling short-circuiting with dynamic re-sorting on lazy array matching, plus `explain` / `trace` debugging. | Query planner uses B-tree indexes / collection scans on persisted documents. |
+
+### 3.8 Cross-Language Portable Subset
+Rules written within the portable subset produce identical match results across all five implementations (`mongory-core`, `mongory-rb`, `mongory-py`, `mongory-go`, and `mongory-js`). Features outside this subset are either language-specific extensions or depend on the host engine.
+
+| Dimension | Portable Subset (Guaranteed Identical) | Outside Portable Subset (Engine- or Binding-Specific) |
+|-----------|----------------------------------------|-------------------------------------------------------|
+| **Data types** | The 6 JSON types: `null`, `boolean`, `number`, `string`, `array`, `object` | Language-native types such as Go structs and `time.Time`, Ruby `Symbol` and `Time`, JS `Date`, `BigInt`, and `Uint8Array`, and Python `datetime`, `tuple`, and `set` |
+| **Integers** | Safe integers in `[-(2^53 - 1), 2^53 - 1]` (`-9007199254740991` to `9007199254740991`) | 64-bit integers beyond `±(2^53 - 1)` lose precision in JavaScript `JSON.parse` (`float64`), while C, Go, Ruby, and Python preserve exact integer values |
+| **Floating-point** | Finite IEEE-754 `float64` values; `-0.0` equals `0` and `0.0` | `NaN`, `Infinity`, and `-Infinity` (not valid JSON) |
+| **Regex syntax** | RE2-compatible subset in section 3.4; explicit ASCII ranges (`[0-9]`, `[A-Za-z0-9_]`) when matching non-ASCII text | Backreferences, lookaround assertions, atomic groups, possessive quantifiers, and Unicode matching on `\d`/`\w`/`\s` (Python 3 `re` matches Unicode digits and letters by default; Go RE2 and JS match ASCII) |
+| **Multiline `^` and `$`** | Single-line strings without `\n`, or multi-line strings with `"$options": "m"` | Multi-line strings using `^` or `$` without `"$options": "m"` (Ruby Oniguruma always treats `^` and `$` as line boundaries; RE2, PCRE2, Python `re`, and JS match string boundaries) |
+| **Regex flags** | `"i"`, `"m"`, `"s"` | Other flags (such as `x`, `u`, `g`, `y`) fail compilation |
 
 ---
 

@@ -107,5 +107,24 @@
       { "data": { "meta": { "a": 1, "b": "x", "c": 2 } }, "expected": false },
       { "data": { "meta": { "a": 1 } }, "expected": false }
     ]
+  },
+  {
+    "description": "portable subset: IEEE-754 safe integer boundaries and negative zero equality",
+    "condition": {
+      "$or": [
+        { "id": { "$eq": 9007199254740991 } },
+        { "id": { "$eq": -9007199254740991 } },
+        { "zero": { "$eq": 0 } }
+      ]
+    },
+    "records": [
+      { "data": { "id": 9007199254740991 }, "expected": true },
+      { "data": { "id": 9007199254740990 }, "expected": false },
+      { "data": { "id": -9007199254740991 }, "expected": true },
+      { "data": { "id": -9007199254740990 }, "expected": false },
+      { "data": { "zero": -0.0 }, "expected": true },
+      { "data": { "zero": 0.0 }, "expected": true },
+      { "data": { "zero": 1 }, "expected": false }
+    ]
   }
 ]

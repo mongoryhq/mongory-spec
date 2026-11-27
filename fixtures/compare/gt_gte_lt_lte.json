@@ -100,5 +100,19 @@
       { "data": { "c": false }, "expected": false },
       { "data": { "d": { "x": 1 } }, "expected": false }
     ]
+  },
+  {
+    "description": "portable subset: IEEE-754 safe integer boundary ordering",
+    "condition": {
+      "id": {
+        "$gte": -9007199254740991,
+        "$lt": 9007199254740991
+      }
+    },
+    "records": [
+      { "data": { "id": -9007199254740991 }, "expected": true },
+      { "data": { "id": 9007199254740990 }, "expected": true },
+      { "data": { "id": 9007199254740991 }, "expected": false }
+    ]
   }
 ]
