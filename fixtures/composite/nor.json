@@ -1,0 +1,139 @@
+[
+  {
+    "description": "top-level $nor with basic fields",
+    "condition": {
+      "$nor": [
+        { "name": "John" },
+        { "age": 30 }
+      ]
+    },
+    "records": [
+      { "data": { "name": "Frank", "age": 25 }, "expected": true },
+      { "data": { "name": "John", "age": 25 }, "expected": false },
+      { "data": { "name": "Frank", "age": 30 }, "expected": false },
+      { "data": { "name": "John", "age": 30 }, "expected": false },
+      { "data": {}, "expected": true },
+      { "data": null, "expected": true }
+    ]
+  },
+  {
+    "description": "top-level empty $nor always matches",
+    "condition": {
+      "$nor": []
+    },
+    "records": [
+      { "data": {}, "expected": true },
+      { "data": { "name": "John" }, "expected": true },
+      { "data": "anything", "expected": true }
+    ]
+  },
+  {
+    "description": "top-level single-branch $nor negates its branch",
+    "condition": {
+      "$nor": [
+        { "status": "banned" }
+      ]
+    },
+    "records": [
+      { "data": { "status": "active" }, "expected": true },
+      { "data": { "status": "banned" }, "expected": false },
+      { "data": {}, "expected": true }
+    ]
+  },
+  {
+    "description": "top-level $nor with complex conditions",
+    "condition": {
+      "$nor": [
+        {
+          "name": "John",
+          "age": { "$gt": 25 }
+        },
+        {
+          "tags": "engineer",
+          "salary": { "$gte": 100000 }
+        }
+      ]
+    },
+    "records": [
+      { "data": { "name": "John", "age": 20 }, "expected": true },
+      {
+        "data": {
+          "name": "Frank",
+          "tags": ["developer"],
+          "salary": 80000
+        },
+        "expected": true
+      },
+      { "data": { "name": "John", "age": 30 }, "expected": false },
+      {
+        "data": {
+          "name": "Frank",
+          "tags": ["engineer", "developer"],
+          "salary": 120000
+        },
+        "expected": false
+      },
+      {
+        "data": {
+          "name": "Alice",
+          "age": 35,
+          "tags": ["engineer"],
+          "salary": 150000
+        },
+        "expected": false
+      }
+    ]
+  },
+  {
+    "description": "nested field-level $nor",
+    "condition": {
+      "profile": {
+        "$nor": [
+          { "name": "Joy" },
+          { "age": 18 }
+        ]
+      }
+    },
+    "records": [
+      { "data": { "profile": { "name": "Frank", "age": 20 } }, "expected": true },
+      { "data": { "profile": {} }, "expected": true },
+      { "data": { "profile": null }, "expected": true },
+      { "data": {}, "expected": true },
+      { "data": { "profile": { "name": "Joy", "age": 18 } }, "expected": false },
+      { "data": { "profile": { "name": "Joy", "age": 20 } }, "expected": false },
+      { "data": { "profile": { "name": "Frank", "age": 18 } }, "expected": false },
+      { "data": null, "expected": false }
+    ]
+  },
+  {
+    "description": "field-level $nor on array field applies to container directly",
+    "condition": {
+      "tags": {
+        "$nor": [
+          { "$size": 0 },
+          { "$in": ["blocked", "spam"] }
+        ]
+      }
+    },
+    "records": [
+      { "data": { "tags": ["ruby", "go"] }, "expected": true },
+      { "data": { "tags": [] }, "expected": false },
+      { "data": { "tags": ["ruby", "spam"] }, "expected": false },
+      { "data": { "tags": ["blocked"] }, "expected": false }
+    ]
+  },
+  {
+    "description": "$nor with non-array condition raises error",
+    "condition": {
+      "$nor": { "a": 1 }
+    },
+    "error": true
+  },
+  {
+    "description": "$nor with non-object element raises error",
+    "condition": {
+      "$nor": [123]
+    },
+    "error": true
+  }
+]

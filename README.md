@@ -30,6 +30,7 @@ mongory-spec/
     ├── composite/
     │   ├── and.json                 # $and (top-level & field-level)
     │   ├── or.json                  # $or (top-level & field-level)
+    │   ├── nor.json                 # $nor (top-level, field-level, array container, empty)
     │   ├── not.json                 # $not (negation of subconditions)
     │   └── real_world_rules.json    # Multi-operator end-to-end rules (promotions, webhooks, feature flags)
     ├── array/
@@ -114,7 +115,7 @@ When a field's value in a record is an **Array**:
 1. **Implicit Scalar Condition** (`{ "tags": "ruby" }`): Matches if `"ruby"` is an element of `tags`.
 2. **Implicit Array Condition** (`{ "tags": ["go", "ruby"] }`): Matches if `tags` equals `["go", "ruby"]` as a whole array **OR** contains `["go", "ruby"]` as a nested array element.
 3. **Implicit Operator / Sub-document Condition** (`{ "scores": { "$gt": 5, "$lt": 8 } }` or `{ "people": { "name": "Billy", "age": 18 } }`):
-   - Array-level operators (`$elemMatch`, `$every`, `$size`, `$in`, `$nin`, `$not`, `$and`, `$or`, `$exists`, `$present`) and integer index keys (`"0"`, `"-1"`) apply to the array as a whole.
+   - Array-level operators (`$elemMatch`, `$every`, `$size`, `$in`, `$nin`, `$not`, `$and`, `$or`, `$nor`, `$exists`, `$present`) and integer index keys (`"0"`, `"-1"`) apply to the array as a whole.
    - Comparison operators (`$gt`, `$gte`, `$lt`, `$lte`), `$regex`, scalar `$eq`, and sub-field conditions are grouped into an implicit **`$elemMatch`** (a single element in the array must satisfy all grouped conditions simultaneously).
 4. **Explicit `$eq` and `$ne` on Array Values**:
    - `$eq` matches if the array itself equals the target value **OR** any element in the array equals the target value.
@@ -159,7 +160,8 @@ Mongory is **MongoDB-inspired** for in-memory rule evaluation and differs intent
 | **`$every`** | Built-in array quantifier; requires **all** elements to match and returns `false` on empty arrays `[]` (no vacuous truth). | Not a native query operator (requires `$not` + `$elemMatch` or `$expr`/`$allElementsTrue`). |
 | **`$present`** | Built-in presence check (ActiveSupport-style): `false` for missing key, `null`, `false`, `""`, `[]`, and `{}`; `true` for numbers (including `0`) and non-empty strings/arrays/objects. | Not a native operator. |
 | **`$regex` / `$options`** | Restricted to the cross-engine regex subset (`^`, `$`, character classes, quantifiers, alternation/groups) and flags `i`, `m`, `s`. | Supports full PCRE2 extensions and additional flags such as `x` and `u`. |
-| **Operators outside the 17** | Unknown `$`-prefixed keys fail compilation. Aggregation (`$expr`), bitwise, geospatial, `$type`, `$mod`, `$text`, and update operators are excluded. | Supported in MongoDB query/aggregation pipelines. |
+| **`$nor`** | Supported at both top-level and field-level; empty `$nor: []` returns `true` (matching `$and: []`). | Restricted to top-level / logical clauses; empty `$nor: []` is rejected. |
+| **Operators outside the 18** | Unknown `$`-prefixed keys fail compilation. Aggregation (`$expr`), bitwise, geospatial, `$type`, `$mod`, `$text`, and update operators are excluded. | Supported in MongoDB query/aggregation pipelines. |
 | **In-memory evaluation extensions** | Supports priority-sorted sibling short-circuiting with dynamic re-sorting on lazy array matching, plus `explain` / `trace` debugging. | Query planner uses B-tree indexes / collection scans on persisted documents. |
 
 ### 3.8 Cross-Language Portable Subset
