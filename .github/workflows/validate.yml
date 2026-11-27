@@ -1,4 +1,4 @@
-name: Validate fixtures against schema.json
+name: Validate Schema
 
 on:
   push:
