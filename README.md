@@ -90,10 +90,10 @@ Every `.json` file under `fixtures/` is a JSON array of test suites conforming t
 ## 3. Core Semantic Rules
 
 ### 3.1 Field Lookup & Key Resolution
-1. **Dot Notation (Binding Responsibility)**:
+1. **Dot Notation**:
    - A field key containing unescaped `.` (e.g., `"a.b.c": 10`) traverses nested objects/arrays (`{ "a": { "b": { "c": 10 } } }`), and overlapping dotted prefixes deep-merge (`{ "a.b": 1, "a.c": 2 }` → `{ "a": { "b": 1, "c": 2 } }`).
-   - Expanding dotted keys and unescaping `\.` is the responsibility of each **language binding / condition normalizer** (e.g., `mongory-rb`'s `ConditionConverter`/`KeyConverter`, `mongory-go`'s condition normalizer) before building the matcher tree, rather than `mongory-core` itself.
-2. **Escaped Dots (Binding Responsibility)**:
+   - Leaf collisions (e.g., `{ "a": 1, "a.b": 2 }`) preserve both clauses via `$and`.
+2. **Escaped Dots**:
    - `\.` in a field key is unescaped to a literal `.` without splitting (e.g., `"a\\.b.c"` expands to `{ "a.b": { "c": ... } }` and looks up literal key `"a.b"`).
 3. **Array Index Keys**:
    - Canonical base-10 integer keys (`"0"`, `"1"`, `"-1"`, etc.) index into arrays (`0`-based from start, negative from end) **or** match string/integer keys on objects.
